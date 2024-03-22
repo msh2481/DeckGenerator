@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.10"
 wordfreq = "^3.1.1"
 openai = "^1.14.2"
 beartype = "^0.17.2"
