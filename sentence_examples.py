@@ -1,6 +1,8 @@
+import argparse
 import json
 
 import openai
+import time
 from beartype import beartype as typed
 from tqdm import tqdm  # type: ignore
 
@@ -103,10 +105,6 @@ Example for "abheben":
 
 
 if __name__ == "__main__":
-    # use argparse to get the required `vocab_size`
-
-    import argparse
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--vocab_size", type=int, required=True)
     args = parser.parse_args()
@@ -117,9 +115,14 @@ if __name__ == "__main__":
     results = dict()
     with open("log.jsonl", "w", encoding="utf-8") as f:
         for word in tqdm(words):
-            result = ask(german_prompt(word))
-            print(word, file=f)
-            print(result, file=f, flush=True)
-            results[word] = json.loads(result)
+            while True:
+                try:
+                    result = ask(german_prompt(word))
+                    print(word, file=f)
+                    print(result, file=f, flush=True)
+                    results[word] = json.loads(result)
+                    break
+                except:
+                    time.sleep(1)
     with open("results.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
