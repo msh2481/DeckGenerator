@@ -1,12 +1,10 @@
-# %%
-import matplotlib.pyplot as plt
-import numpy as np
+import json
+
 import openai
-import wordfreq as wf
 from beartype import beartype as typed
 from tqdm import tqdm  # type: ignore
 
-client = None  # openai.Client()
+client = openai.Client()
 
 
 @typed
@@ -14,16 +12,18 @@ def ask(prompt: str) -> str:
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
-        # response_format={"type": "json_object"},
+        response_format={"type": "json_object"},
     )
-    return response.choices[0].message.content
+    result = response.choices[0].message.content
+    assert isinstance(result, str)
+    return result
 
 
 @typed
 def german_prompt(word: str) -> str:
     few_shot = """
 Task:
-- Create example of German sentences containing the given word and their English translations.
+- Create example of German sentences containing the given word and their English translations, in JSON format.
 - If the word has several unrelated meanings or can be of different parts of speech, make sure to show all of them.
 - For each meaning provide 2-3 sentences.
 - Very important: use the word in many different ways, e.g. different tenses, cases, declensions and so on. The goal is to show in general how to use this word in various grammatical contexts.
@@ -102,30 +102,24 @@ Example for "abheben":
     return f'{few_shot}\nYou need to create sentences for the word "{word}".'
 
 
-# %%
-total = np.float64(0)
-ylist = []
-for word in tqdm(wf.top_n_list("de", 10**6, wordlist="large")):
-    if len(duden.search(word)):
-        frequency = wf.word_frequency(word, "de", wordlist="large")
-        total += frequency
-        ylist.append(total)
-y = np.array(ylist) / total
-y = 1 - y
-x = np.arange(1, len(y) + 1)
+if __name__ == "__main__":
+    # use argparse to get the required `vocab_size`
 
-# %%
-plt.figure(figsize=(10, 10), dpi=200)
-plt.loglog(x, y, "k", lw=1)
-plt.grid("minor")
-plt.xlabel("Vocabulary size")
+    import argparse
 
-# %%
-words = [word for word in wf.top_n_list("de", 10**5, wordlist="large")]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--vocab_size", type=int, required=True)
+    args = parser.parse_args()
 
+    with open("words_de.txt", "r", encoding="utf-8") as f:
+        words = [line.strip().split("\t")[0] for line in f][: args.vocab_size]
 
-# %%
-duden.search("")
-# %%
-
-# %%
+    results = dict()
+    with open("log.jsonl", "w", encoding="utf-8") as f:
+        for word in tqdm(words):
+            result = ask(german_prompt(word))
+            print(word, file=f)
+            print(result, file=f, flush=True)
+            results[word] = json.loads(result)
+    with open("results.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
