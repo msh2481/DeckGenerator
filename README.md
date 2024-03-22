@@ -1,6 +1,7 @@
 # DeckGenerator
 AI-powered generator of Anki decks for language learning.
 
+
 ## Card format
 It's very simple. Each word X will spawn two cards.
 
@@ -26,3 +27,7 @@ Additionally, install German module for spaCy:
 ```bash
 python -m spacy download de_core_news_md
 ```
+
+## How many words are needed?
+German:
+![frequencies](img/german_frequencies.svg)
