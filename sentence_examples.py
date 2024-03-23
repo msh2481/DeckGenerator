@@ -6,13 +6,15 @@ import time
 from beartype import beartype as typed
 from tqdm import tqdm  # type: ignore
 
+MODEL = "gpt-4-0125-preview"
+
 client = openai.Client()
 
 
 @typed
 def ask(prompt: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
     )
@@ -122,7 +124,8 @@ if __name__ == "__main__":
                     print(result, file=f, flush=True)
                     results[word] = json.loads(result)
                     break
-                except:
+                except Exception as e:
+                    print(e)
                     time.sleep(1)
     with open("results.json", "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
