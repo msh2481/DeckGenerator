@@ -1,12 +1,12 @@
 import json
 import os
 import time
-from hashlib import sha256
 
 import openai  # type: ignore
 
 from beartype import beartype as typed
 from tqdm import tqdm  # type: ignore
+from utils import h
 
 client = openai.Client()
 
@@ -27,18 +27,13 @@ def pronounce(text_prompt: str, filename: str) -> None:
             time.sleep(1)
 
 
-@typed
-def h(text_prompt: str) -> str:
-    return sha256(bytes(text_prompt.strip(), encoding="utf-8")).hexdigest()
-
-
 if __name__ == "__main__":
     if not os.path.exists("audio"):
         os.mkdir("audio")
     with open("results.json", "r", encoding="utf-8") as f:
         results = json.load(f)
-    pairs: list[tuple[str, str]] = []
 
+    pairs: list[tuple[str, str]] = []
     for _, result in results.items():
         k = len(result["English"])
         for i in range(k):

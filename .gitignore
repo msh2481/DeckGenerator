@@ -1,2 +1,4 @@
 poetry.lock
 audio/
+__pycache__
+*.apkg
