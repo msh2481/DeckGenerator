@@ -33,7 +33,7 @@ The generation process:
 2. `python sentence_examples.py --vocab_size N` will create examples sentences with the first `N` words, 3-6 sentences with each typically. You can select GPT version in `sentence_examples.py`. The produced file is `results.json`.
 3. `python audio.py` will use OpenAI TTS to generate audio for each sentence to the folder `audio`, skipping already generated ones.
 
-( Pulling the files from Git LFS should take you to this step )
+( Pulling the files from Git and unpacking [audio.zip](https://drive.google.com/file/d/1H5JTlBlZN8R7jZqMHfOmgrma_p0AUBcx/view?usp=sharing) should take you to this step )
 
 4. `python build_deck.py --n_pairs N` will take first `N` sentence pairs and package them into `.apkg` file, which can be imported by Anki.
 
